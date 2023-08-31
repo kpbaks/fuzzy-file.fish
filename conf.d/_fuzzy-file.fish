@@ -97,14 +97,14 @@ function __fuzzy-file.fish::fzf_file_completion
         set selected_files (command fzf $fzf_opts)
     end
 
-    echo $selected_files
-
     for s in $pipestatus
         if test $s -ne 0
             commandline --function repaint
             return $s
         end
     end
+
+    test (count $selected_files) -eq 0; and return 0 # No files selected
 
     # Sanitize the selected files so the commandline is not broken
     # e.g. if you select a file with a space in it, then the commandline will be broken
