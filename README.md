@@ -1,6 +1,6 @@
-# ctrl-f.fish
+# fuzzy-file.fish
 
 ## Installation
 ```fish
-fisher install kpbaks/ctrl-f.fish
+fisher install kpbaks/fuzzy-file.fish
 ```
