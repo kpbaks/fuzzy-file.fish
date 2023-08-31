@@ -58,7 +58,7 @@ function __fuzzy-file.fish::fzf_file_completion
         --bind=ctrl-a:select-all \
         --bind=ctrl-d:preview-page-down \
         --bind=ctrl-u:preview-page-up \
-        --bind=fuzzy-file:page-down \
+        --bind=ctrl-f:page-down \
         --bind=ctrl-b:page-up \
         --header='The selected file(s) will be inserted at the cursor position' \
         --query="$token_under_cursor"
@@ -92,6 +92,8 @@ function __fuzzy-file.fish::fzf_file_completion
     else
         set selected_files (command fzf $fzf_opts)
     end
+
+    echo $selected_files
 
     for s in $pipestatus
         if test $s -ne 0
