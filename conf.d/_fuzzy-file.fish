@@ -37,6 +37,7 @@ function __fuzzy-file.fish::fzf_file_completion
     # If the selected files have an extension, that is not a text file, say .pdf or .png
     # then open them in the default application, with `xdg-open` or 'flatpak-xdg-open'
 
+    # --color="border:#00ffff,header:#ff00ff" \
     set --local fzf_opts \
         --reverse \
         --border-label=" $(string upper "fuzzy-file.fish") " \
@@ -52,6 +53,9 @@ function __fuzzy-file.fish::fzf_file_completion
         --header-first \
         --scroll-off=5 \
         --color='marker:#00ff00' \
+        --color="header:#$fish_color_command" \
+        --color="info:#$fish_color_keyword" \
+        --color="prompt:#$fish_color_autosuggestion" \
         --color='border:#F80069' \
         --color="gutter:-1" \
         --no-scrollbar \
