@@ -29,9 +29,27 @@ status is-interactive; or return
 __fuzzy-file.fish::check_dependencies; or return 1
 
 function __fuzzy-file.fish::fzf_file_completion
+    # TODO: <kpbaks 2023-09-01 15:00:21> maybe have some predefined filters, for known commands
+    # e.g. if the command is `git`, then only show files that are tracked by git
+    # e.g. if the command is `nvim`, then only show files that are text files
     set --local cmdline (commandline | string trim)
     set --local cursor_position (commandline --cursor)
     set --local token_under_cursor (commandline --current-token)
+    set --local tokens (commandline --tokenize)
+    set --local search_for_directories 0
+    if test (count $tokens) -gt 0
+        set --local idx 1
+        if test (count $tokens) -gt 1
+            test $tokens[1] = command; and set idx 2
+        end
+        if contains -- $tokens[$idx] cd z rmdir pushd popd
+            set search_for_directories 1
+        end
+    end
+
+    set --local prompt (printf "  select %s: " (test $search_for_directories -eq 1; and echo "directories"; or echo "files"))
+    set --local header (printf "The selected %s will be inserted at the cursor position" (test $search_for_directories -eq 1; and echo "directories"; or echo "files"))
+
     # if cmdline is empty, then 99 out of 100 times, I want to pick a file(s)
     # and open it in `nvim`, so `nvim` should be prepended to the commandline
     # If the selected files have an extension, that is not a text file, say .pdf or .png
@@ -48,7 +66,7 @@ function __fuzzy-file.fish::fzf_file_completion
         --pointer='|>' \
         --marker='✓ ' \
         --no-mouse \
-        --prompt="  select file(s): " \
+        --prompt=$prompt \
         --exit-0 \
         --header-first \
         --scroll-off=5 \
@@ -64,9 +82,10 @@ function __fuzzy-file.fish::fzf_file_completion
         --bind=ctrl-u:preview-page-up \
         --bind=ctrl-f:page-down \
         --bind=ctrl-b:page-up \
-        --header='The selected file(s) will be inserted at the cursor position' \
+        --header=$header \
         --query="$token_under_cursor"
 
+    # --inline-info \
     # Change layout depending on terminal size
     # 80 is the minimum number of columns, that I want to have.
     # 5 is subtracted, because the border takes up some columns
@@ -79,19 +98,29 @@ function __fuzzy-file.fish::fzf_file_completion
 
     # TODO: <kpbaks 2023-06-18 20:30:07> Create a separate script for this e.g. `preview.sh`
     # TODO: <kpbaks 2023-06-18 20:15:53> use `pdftotext {} -` to preview pdf files
-    if command --query bat
-        # Use bat to preview files
-        set --append fzf_opts --preview 'bat --color=always --style=numbers --line-range=:100 {}'
-    else if command --query cat
-        set --append fzf_opts --preview 'cat --number {}'
+    if test $search_for_directories -eq 1
+        if command --query exa
+            # Use exa to preview directories
+            set --append fzf_opts --preview 'exa --long --color=always --icons --group-directories-first --git {}'
+        else
+            set --append fzf_opts --preview 'ls -l --color=always --group-directories-first {}'
+        end
+    else
+        if command --query bat
+            # Use bat to preview files
+            set --append fzf_opts --preview 'bat --color=always --style=numbers --line-range=:100 {}'
+        else if command --query cat
+            set --append fzf_opts --preview 'cat --number {}'
+        end
     end
 
 
     set --local selected_files
     # NOTE: Use `command` to ensure no user defined wrappers are called instead
-    if set --query fd
+    if command --query fd
         # Use `fd` if installed to use .gitignore
-        set --local fd_opts --type f
+        set --local type (test $search_for_directories -eq 1; and echo d; or echo f)
+        set --local fd_opts --type $type
         set selected_files (command fd $fd_opts | command fzf $fzf_opts)
     else
         set selected_files (command fzf $fzf_opts)
