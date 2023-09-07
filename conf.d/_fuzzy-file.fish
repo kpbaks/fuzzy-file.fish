@@ -120,7 +120,7 @@ function __fuzzy-file.fish::fzf_file_completion
     if command --query fd
         # Use `fd` if installed to use .gitignore
         set --local type (test $search_for_directories -eq 1; and echo d; or echo f)
-        set --local fd_opts --type $type
+        set --local fd_opts --type $type --hidden --ignore
         set selected_files (command fd $fd_opts | command fzf $fzf_opts)
     else
         set selected_files (command fzf $fzf_opts)
