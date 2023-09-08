@@ -120,8 +120,13 @@ function __fuzzy-file.fish::fzf_file_completion
     if command --query fd
         # Use `fd` if installed to use .gitignore
         set --local type (test $search_for_directories -eq 1; and echo d; or echo f)
+        # NOTE: Setting `--hidden --ignore` will include `.git/**/*` in the search results.
+        # This is not what we want, so we filter out paths containing `.git/` with `string match --regex --all --invert -- '\.git/'`
         set --local fd_opts --type $type --hidden --ignore
-        set selected_files (command fd $fd_opts | command fzf $fzf_opts)
+        set selected_files (command fd $fd_opts \
+		| string match --regex --all --invert -- '\.git/' \
+		| command fzf $fzf_opts
+		)
     else
         set selected_files (command fzf $fzf_opts)
     end
