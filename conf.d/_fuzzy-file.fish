@@ -76,6 +76,8 @@ function __fuzzy-file.fish::fzf_file_completion
         --color="prompt:#$fish_color_autosuggestion" \
         --color='border:#F80069' \
         --color="gutter:-1" \
+        --color="hl:#FFB600" \
+        --color="hl+:#FFB600" \
         --no-scrollbar \
         --bind=ctrl-a:select-all \
         --bind=ctrl-d:preview-page-down \
