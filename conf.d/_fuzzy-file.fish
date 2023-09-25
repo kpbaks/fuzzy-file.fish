@@ -202,5 +202,7 @@ function __fuzzy-file.fish::fzf_file_completion
     end
 end
 
-set --query FUZZY_FILE_FISH_KEYBIND; or set --global FUZZY_FILE_FISH_KEYBIND \co
-bind "$FUZZY_FILE_FISH_KEYBIND" '__fuzzy-file.fish::fzf_file_completion; commandline --function repaint'
+# set --query FUZZY_FILE_FISH_KEYBIND; or set --global FUZZY_FILE_FISH_KEYBIND \co
+# set --query FUZZY_FILE_FISH_KEYBIND; or set --global FUZZY_FILE_FISH_KEYBIND \eOM # Shift+Enter (used `fish_key_reader` to get the keybind)
+# bind $FUZZY_FILE_FISH_KEYBIND '__fuzzy-file.fish::fzf_file_completion; commandline --function repaint'
+bind \eOM '__fuzzy-file.fish::fzf_file_completion; commandline --function repaint'
